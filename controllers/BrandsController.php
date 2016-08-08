@@ -170,7 +170,7 @@ class BrandsController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    /*public function actionCreate()
     {
         $model = new Brands();
 
@@ -181,7 +181,7 @@ class BrandsController extends Controller
                 'model' => $model,
             ]);
         }
-    }
+    }*/
 
     /**
      * Updates an existing Brands model.
@@ -189,7 +189,7 @@ class BrandsController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($id)
+    /*public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 
@@ -200,7 +200,7 @@ class BrandsController extends Controller
                 'model' => $model,
             ]);
         }
-    }
+    }*/
 
     /**
      * Deletes an existing Brands model.
@@ -208,12 +208,12 @@ class BrandsController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id)
+    /*public function actionDelete($id)
     {
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
-    }
+    }*/
 
     /**
      * Finds the Brands model based on its primary key value.

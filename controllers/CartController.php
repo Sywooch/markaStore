@@ -8,6 +8,8 @@
 	namespace app\controllers;
 
 	use Yii;
+	use yii\base\ErrorException;
+	use yii\base\Exception;
 	use yii\web\Controller;
 	use yii\helpers\Url;
 	use app\module\admin\models\Order;
@@ -25,70 +27,83 @@
 	{
 		public function actionView()
 		{
-			if(isset($_SESSION['count']) and array_sum($_SESSION['count']) > 0 ){
-				foreach($_SESSION['uid'] as $item){
-					if ($_SESSION['count'][$item] == 0){
-						$cart = false;
+				if (isset($_SESSION['count']) and array_sum($_SESSION['count']) > 0) {
+					foreach ($_SESSION['uid'] as $item) {
+						if ($_SESSION['count'][$item] == 0) {
+							$cart = false;
+						} else {
+							$cart = true;
+						}
 					}
-					else{
-						$cart = true;
-					}
+				} else {
+					$cart = false;
 				}
-			}else{
-				$cart = false;
-			}
 
-			$model = new Order();
+				$model = new Order();
 
-			/*	return $this->render('view', [
-					'model' => $model,
-				]);
-*/
+				/*	return $this->render('view', [
+						'model' => $model,
+					]);
+	*/
 
-			if ($model->load(Yii::$app->request->post()) && $model->save()) {
-				//session_start();
-				foreach($_SESSION['uid'] as $item) {
-							$getCost = ArrayHelper::getValue(Woman::find()->
-							select('sale')->
-							where(['product_id' => $_SESSION['product_id'][$item]])->
-							one(), 'sale');
-							if ($getCost == 0) {
-								$sum[] = ArrayHelper::getValue(Woman::find()->
-									select('cost')->
-									where(['product_id' => $_SESSION['product_id'][$item]])->
-									one(), 'cost') * $_SESSION['count'][$item];
-							} else {
-								$sum[] = $getCost * $_SESSION['count'][$item];
+				if ($model->load(Yii::$app->request->post()) && $model->save()) {
+					//session_start();
+					if (isset($_SESSION['uid'])) {
+						foreach ($_SESSION['uid'] as $item) {
+							if (isset($_SESSION['product_id'][$item])) {
+								$getCost = ArrayHelper::getValue(Woman::find()->
+								select('sale')->
+								where(['product_id' => $_SESSION['product_id'][$item]])->
+								one(), 'sale');
+								if ($getCost == 0) {
+									$sum[] = ArrayHelper::getValue(Woman::find()->
+										select('cost')->
+										where(['product_id' => $_SESSION['product_id'][$item]])->
+										one(), 'cost') * $_SESSION['count'][$item];
+								} else {
+									$sum[] = $getCost * $_SESSION['count'][$item];
+								}
+								Yii::$app->getDb()->
+								createCommand()->
+								update('order', ['final_cost' => array_sum($sum)], "id = $model->id")->
+								execute();
+
+								////////////////////////////////////
+
+								$message = 'Ваш номер замовлення: ' . $model->id . '. Наш менеджер зв`яжеться з Вами найближчим часом';
+								$model->sendEmail($model->email, 'Дякуємо за замовлення!', $message);
+								$messageAdmin = 'Номер замовлення: ' . $model->id .
+									'. <a href="http://markaua.com.ua/index.php/admin/purchases/index?order_id=' . $model->id . '">Переглянути замовлення</a>';
+								$model->sendEmail('markaua2014@gmail.com', 'Замовлення на сайті markaua.com.ua', $messageAdmin);
+								$model->sendEmail('art90com@gmail.com', 'Замовлення на сайті markaua.com.ua', $messageAdmin);
+								////////////////////////////////////
+
+								Yii::$app->getDb()->createCommand()->insert('purchases', [
+									'order_id' => $model->id,
+									'product_id' => $_SESSION['product_id'][$item],
+									'size_id' => $_SESSION['size_id'][$item],
+									'color_id' => $_SESSION['color_id'][$item],
+									'count' => $_SESSION['count'][$item]
+								])->execute();
 							}
-						Yii::$app->getDb()->
-						createCommand()->
-						update('order',['final_cost' => array_sum($sum)],"id = $model->id")->
-						execute();
-
-				Yii::$app->getDb()->createCommand()->insert('purchases', [
-					'order_id' => $model->id,
-					'product_id' => $_SESSION['product_id'][$item],
-					'size_id' => $_SESSION['size_id'][$item],
-					'color_id' => $_SESSION['color_id'][$item],
-					'count' => $_SESSION['count'][$item]
-				])->execute();
+						}
+					}
+					return $this->redirect(['view', 'order_number' => $model->id]);
+				} else {
+					return $this->render('view', [
+						'model' => $model,
+					]);
 				}
-				return $this->redirect(['view', 'order_number' => $model->id]);
-			} else {
-				return $this->render('view', [
-					'model' => $model,
-				]);
-			}
 
-			//return $this->render('view', [
-			//	'model' => $this->findModel($id),
-			//]);
-
+				//return $this->render('view', [
+				//	'model' => $this->findModel($id),
+				//]);
 		}
 
 		public function actionAdd()
 		{
-			session_start();
+			if (!session_start()) session_start();
+
 			if (Yii::$app->request->get('id')){
 
 				/*if (empty($_SESSION['count'])){
@@ -154,7 +169,7 @@
 
 		public function actionDelcartitem()
 		{
-			session_start();
+			if (!session_start()) session_start();
 			if (isset($_GET['delall']) and $_GET['delall'] == '1') {
 				$_SESSION = NULL;
 				$_SESSION = [];
@@ -164,6 +179,7 @@
 					$uid = $_GET['uid'];
 					$_SESSION['count'][$uid] = 0;
 					unset($_SESSION['uid'][$uid]);
+					unset($_SESSION['product_id'][$uid]);
 					unset($_SESSION['product_id'][$uid]);
 					unset($_SESSION['color_id'][$uid]);
 					unset($_SESSION['size_id'][$uid]);

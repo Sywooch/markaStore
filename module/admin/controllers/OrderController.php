@@ -55,7 +55,6 @@ class OrderController extends Controller
             ],
         ]);
 
-
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -91,6 +90,7 @@ class OrderController extends Controller
             session_start();
             $_SESSION['status'] = 1;
             session_write_close();
+            
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
@@ -98,6 +98,7 @@ class OrderController extends Controller
             ]);
         }
     }
+
 
     public function actionSold($id)
     {
@@ -189,6 +190,8 @@ class OrderController extends Controller
         Purchases::deleteAll('order_id = :order_id', [':order_id' => $id]);
         return $this->redirect(['index']);
     }
+
+
 
     /**
      * Finds the Order model based on its primary key value.

@@ -15,6 +15,7 @@
     $this->params['breadcrumbs'][] = $this->title;
     session_start();
 ?>
+
 <div class="woman-view">
     <table class="table" border="0">
         <tr>
@@ -23,14 +24,25 @@
 
                     <?php if (!empty($color)): ?>
 
-                        <?php foreach (Images::find()->select('img_file')->where(['product_id' => $model->product_id])->andWhere(['color_id' => $color])->all() as $img): ?>
+                        <script>
+                            $(document).ready(function(){
+                                <?php foreach(Images::find()->where(['product_id' => $model->product_id])->andWhere(['color_id' => $color])->all() as $img): ?>
+                                $('#image<?= Html::encode($img->id) ?>').zoom();
+                                <?php endforeach; ?>
+                            });
+                        </script>
+
+                        <?php foreach (Images::find()->where(['product_id' => $model->product_id])->andWhere(['color_id' => $color])->all() as $img): ?>
 
                             <?php
                             $imgs = 'images/' . Html::encode($img->img_file);
                             list($width, $height) = getimagesize($imgs); ?>
                             <div class="col-md-<?php echo $width > $height ? '9' : '6'; ?>">
+                                <span class='zoom' id='image<?= Html::encode($img->id) ?>'>
                                 <img style="padding-bottom: 5px; padding-top: 5px;" height="450px" src="<?php echo '/images/' . Html::encode($img->img_file) ?>"
+                                     data-zoom-image="<?php echo '/images/' . Html::encode($img->img_file) ?>"
                                      alt="<?= Html::encode(Yii::$app->name . ': ' . $model->genus->genus . ' ' . $model->name->name . ' ' . $model->brand->brand); ?>">
+                                    </span>
                             </div>
                         <?php endforeach; ?>
 
@@ -45,7 +57,8 @@
                             $imgs = 'images/' . Html::encode($img->img_file);
                             list($width, $height) = getimagesize($imgs); ?>
                             <div class="col-md-<?php echo $width > $height ? '9' : '6'; ?>">
-                                <img style="padding-bottom: 5px; padding-top: 5px;" height="450px" src="<?echo '/images/' . Html::encode($img->img_file) ?>"
+                                <img style="padding-bottom: 5px; padding-top: 5px;" class="my-foto" height="450px" src="<?echo '/images/' . Html::encode($img->img_file) ?>"
+                                     data-large="<?php echo '/images/' . Html::encode($img->img_file) ?>"
                                      alt="<?= Html::encode(Yii::$app->name . ': ' . $model->genus->genus . ' ' . $model->name->name . ' ' . $model->brand->brand); ?>">
                             </div>
                         <?php endforeach; ?>
@@ -81,9 +94,7 @@
         orderBy('size_id')->distinct()->all() as $search ): ?>
 
             <a style="
-            <?php if ($search->size_id == 0): ?>
-                width:90px;
-            <?php else: ?>
+            <?php if (strlen($search->size->size) < 2): ?>
                 width:40px;
             <?php endif ?>
                 height: 40px; border-radius: 3px;
@@ -96,7 +107,7 @@
             <?php else: ?> <?php echo 'color: #1a1a1a;'; ?>
             <?php endif ?>
 
-                " class="btn btn-link active" href="<?= Url::canonical(); ?>&size=<?= Url::to($search->size_id) ?>"><strong><?= Html::encode($search->size->size); ?></strong></a>
+                " class="btn btn-link active" href="<?= Url::current(['size' => $search->size_id]); ?>"><strong><?= Html::encode($search->size->size); ?></strong></a>
         <?php endforeach; ?>
     </div>
     </br></br>
@@ -113,7 +124,7 @@
                         data-toggle="tooltip"
                         data-placement="bottom"
                         data-description="<?= Html::encode($searchcolor->color->color_name); ?>"
-                        onclick="window.location.href='view?id=<?= Html::encode($model->product_id); ?>&color=<?=
+                        onclick="window.location.href='<?= Url::to('view') ?>?id=<?= Html::encode($model->product_id); ?>&color=<?=
                             Html::encode($searchcolor->color_id); ?>&size=<?php
                             echo ArrayHelper::getValue(Sizesofproduct::find()->
                             select('size_id')->
@@ -161,9 +172,9 @@
     </button>
     </br></br>
 <?php
-    $getCount = Sizesofproduct::find()->
+    /*$getCount = Sizesofproduct::find()->
     select(['availability'])->
-    where(['product_id' => $model->product_id, 'size_id' => $_GET['size'], 'color_id' => $_GET['color']])->one();
+    where(['product_id' => $model->product_id, 'size_id' => $_GET['size'], 'color_id' => $_GET['color']])->one();*/
     if($getCount->availability < 1): ?>
         <button style="color: #3c3c3c;" disabled="disabled" type="button" class="btn btn-link btn-lg disabled">Немає в наявності</button>
     <?php else: ?>
@@ -465,3 +476,4 @@
 </table>
 
 </div>
+

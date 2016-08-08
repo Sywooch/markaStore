@@ -60,7 +60,7 @@ class UserController extends Controller
      */
     public function actionCreate()
     {
-		$model = new User;
+		/*$model = new User;
 		
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
@@ -69,8 +69,22 @@ class UserController extends Controller
 			return $this->render('create', [
 				'model' => $model,
 			]);
-		}
+		}*/
 
+
+        $model = new User();
+
+        if ($model->load(Yii::$app->request->post())){
+            $model->password = md5($model->password);
+            $model->auth_key = Yii::$app->getSecurity()->generatePasswordHash($model->password);
+            $model->password_check = $model->password;
+            $model->save();
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render('create', [
+                'model' => $model,
+            ]);
+        }
 
 		/** @var User $user */
 
@@ -102,11 +116,31 @@ class UserController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        /*$model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
+            return $this->render('update', [
+                'model' => $model,
+            ]);
+        }*/
+        $model = $this->findModel($id);
+        $model->password_check = $model->password;
+        $user = $model->password;
+        if ($model->load(Yii::$app->request->post())){
+
+            if ($model->password != $user) {
+                $model->password = md5($model->password);
+                $model->auth_key = Yii::$app->getSecurity()->generatePasswordHash($model->password);
+                $model->password_check = $model->password;
+                $model->save();
+            }else{
+                $model->password = $user;
+                $model->save();
+            }
+            return $this->redirect(['view', 'id' => $model->id]);
+        }else {
             return $this->render('update', [
                 'model' => $model,
             ]);

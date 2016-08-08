@@ -11,6 +11,7 @@ use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
+use app\module\admin\models\Log;
 
 /**
  * ImagesController implements the CRUD actions for Images model.
@@ -92,6 +93,15 @@ class ImagesController extends Controller
                 $model->img_file = $imgname . '.' . $model->file->extension;
             }
             $model->save();
+
+            $newModel = [
+                'id' => $model->id,
+                'product_id' => $model->product_id,
+                'color_id' => $model->color->color_name,
+                'file' => $model->file,
+            ];
+            Log::writeLog(Log::logMessageGenerator(false, $newModel, $model), 'Create', 'Фото товаров');
+
             return $this->redirect(['view', 'id' => $model->id]);
         }else {
             return $this->render('create', [
@@ -121,6 +131,15 @@ class ImagesController extends Controller
                 $model->img_file = $imgname . '.' . $model->file->extension;
             }
             $model->save();
+
+            $newModel = [
+                'id' => $model->id,
+                'product_id' => $model->product_id,
+                'color_id' => $model->color->color_name,
+                'file' => $model->file,
+            ];
+            Log::writeLog(Log::logMessageGenerator(false, $newModel, $model), 'Create', 'Фото товаров');
+
             return $this->redirect(['view', 'id' => $model->id]);
         }else {
             return $this->render('create', [
@@ -134,7 +153,7 @@ class ImagesController extends Controller
 
     public function imageResize($src_image, $dst_image)
     {
-        $heightResult = 1000;
+        $heightResult = 1500;
         list($width, $height) = getimagesize($src_image);
             if ($height > $heightResult) {
                 $widthResult = ($heightResult / $height) * $width;
@@ -159,6 +178,14 @@ class ImagesController extends Controller
     {
 
         $model = $model = $this->findModel($id);
+
+        $oldModel = [
+            'id' => $model->id,
+            'product_id' => $model->product_id,
+            'color_id' => $model->color->color_name,
+            'file' => $model->file,
+        ];
+        
         $imgname = uniqid();
         if ($model->load(Yii::$app->request->post())) {
             $model->file = UploadedFile::getInstance($model, 'file');
@@ -173,10 +200,28 @@ class ImagesController extends Controller
                     $model->img_file = $imgname . '.' . $model->file->extension;
                 }
                 $model->save();
+
+                $newModel = [
+                    'id' => $model->id,
+                    'product_id' => $model->product_id,
+                    'color_id' => $model->color->color_name,
+                    'file' => $model->file,
+                ];
+                Log::writeLog(Log::logMessageGenerator($oldModel, $newModel, $model), 'Update', 'Фото товаров');
+
                 return $this->redirect(['view', 'id' => $model->id]);
             }else{
                 $model->save();
-                    return $this->redirect(['view', 'id' => $model->id]);
+
+                $newModel = [
+                    'id' => $model->id,
+                    'product_id' => $model->product_id,
+                    'color_id' => $model->color->color_name,
+                    'file' => $model->file,
+                ];
+                Log::writeLog(Log::logMessageGenerator($oldModel, $newModel, $model), 'Update', 'Фото товаров');
+
+                return $this->redirect(['view', 'id' => $model->id]);
             }
         }else {
             return $this->render('update', [
@@ -205,6 +250,12 @@ class ImagesController extends Controller
     {
         unlink('images/' . substr($this->findModel($id)->img_file, strrpos($this->findModel($id)->img_file, '/')));
         $this->findModel($id)->delete();
+
+        $newModel = [
+            'id' => $id,
+        ];
+        $model = new Images();
+        Log::writeLog(Log::logMessageGenerator(false, $newModel, $model), 'Delete', 'Фото товаров');
         //return print ('uploads' . substr($this->findModel($id)->img_file, strrpos($this->findModel($id)->img_file, '/')));
         return $this->redirect(['index']);
     }

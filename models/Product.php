@@ -66,40 +66,45 @@ class Product extends \yii\db\ActiveRecord
 
     public function getName()
     {
-        return$this->hasOne(Names::className(),['id'=>'name_id']);
+        return $this->hasOne(Names::className(),['id'=>'name_id']);
     }
 
     public function getType()
     {
-        return$this->hasOne(Types::className(),['id'=>'type_id']);
+        return $this->hasOne(Types::className(),['id'=>'type_id']);
     }
 
     public function getBrand()
     {
-        return$this->hasOne(Brands::className(),['id'=>'brand_id']);
+        return $this->hasOne(Brands::className(),['id'=>'brand_id']);
     }
 
     public function getGenus()
     {
-        return$this->hasOne(Genus::className(),['id'=>'genus_id']);
+        return $this->hasOne(Genus::className(),['id'=>'genus_id']);
     }
     public function getImage()
     {
-        return$this->hasOne(Images::className(),['product_id'=>'product_id']);
+        return $this->hasOne(Images::className(),['product_id'=>'product_id']);
     }
     public function getSize()
     {
-        return$this->hasOne(Sizesofproduct::className(),['product_id'=>'product_id']);
+        return $this->hasOne(Sizesofproduct::className(),['product_id'=>'product_id']);
     }
 
     public function getColor()
     {
-        return$this->hasOne(Sizesofproduct::className(),['product_id'=>'product_id']);
+        return $this->hasOne(Sizesofproduct::className(),['product_id'=>'product_id']);
     }
 
     public function getCount($types = false, $genus = false)
     {
         return Product::find()->where(['type_id' => $types, 'genus_id' => $genus, 'public' => 1])->andWhere(['public' => 1])->count();
+    }
+
+    public function getCountByBrand($types = false, $brand = false)
+    {
+        return Product::find()->where(['brand_id' => $brand])->andWhere(['type_id' => $types])->andWhere(['public' => 1])->count();
     }
 
 }

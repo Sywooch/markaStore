@@ -16,6 +16,8 @@ use Yii;
  * @property integer $quantity
  * @property integer $cost
  * @property string $description
+ * @property string $date
+ * @property string $date_change
  */
 class Product extends \yii\db\ActiveRecord
 {
@@ -37,7 +39,7 @@ class Product extends \yii\db\ActiveRecord
             [['name_id', 'brand_id', 'genus_id', 'type_id', /*'size_id', 'quantity',*/ 'cost'], 'required'],
             [['name_id', 'brand_id', 'genus_id', 'type_id', /*'quantity',*/ 'cost'], 'integer'],
            // [['description', 'brand_art'], 'string'],
-            [['description', 'brand_art', 'public'], 'safe'],
+            [['description', 'brand_art', 'public', 'sale'], 'safe'],
             //[['size_id'], 'string', 'max' => 50]
         ];
     }
@@ -61,6 +63,8 @@ class Product extends \yii\db\ActiveRecord
             'cost' => 'Цена',
             'description' => 'Описание',
             'public' => 'Public',
+            'date' => 'Дата создания',
+            'date_change' => 'Дата изменения',
         ];
     }
 
@@ -91,9 +95,14 @@ class Product extends \yii\db\ActiveRecord
         return$this->hasOne(Genus::className(),['id'=>'genus_id']);
     }
 
+    public function getColor()
+    {
+        return $this->hasOne(Sizesofproduct::className(),['product_id'=>'product_id']);
+    }
+
     public function getSize()
     {
-        return$this->hasOne(Sizesofproduct::className(),['id'=>'size_id']);
+        return $this->hasOne(Sizesofproduct::className(),['product_id'=>'product_id']);
     }
 
     public function getCount($types = false, $genus = false)

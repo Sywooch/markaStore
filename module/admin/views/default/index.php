@@ -49,7 +49,7 @@
                 $ssmf[] = $ffddf->count();
                 $summa[] = array_sum($ssmf);
             }
-            $max = max($summa);
+			$max = max(isset($summa) ? $summa : [1]);
         ?>
 		<p><h3><?= date('o') ?></h3></p>
 		<table class="table">

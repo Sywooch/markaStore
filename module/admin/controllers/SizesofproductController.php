@@ -8,6 +8,7 @@ use app\module\admin\models\SizesofproductSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\module\admin\models\Log;
 
 /**
  * SizesofproductController implements the CRUD actions for Sizesofproduct model.
@@ -63,6 +64,14 @@ class SizesofproductController extends Controller
         $model = new Sizesofproduct();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $newModel = [
+                'id' => $model->id,
+                'product_id' => $model->product_id,
+                'size_id' => $model->size->size,
+                'color_id' => $model->color->color_name,
+                'availability' => $model->availability,
+            ];
+            Log::writeLog(Log::logMessageGenerator(false, $newModel, $model), 'Create', 'Размеры и количество');
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
@@ -81,6 +90,14 @@ class SizesofproductController extends Controller
         $model = new Sizesofproduct();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $newModel = [
+                'id' => $model->id,
+                'product_id' => $model->product_id,
+                'size_id' => $model->size->size,
+                'color_id' => $model->color->color_name,
+                'availability' => $model->availability,
+            ];
+            Log::writeLog(Log::logMessageGenerator(false, $newModel, $model), 'Create', 'Размеры и количество');
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
@@ -101,7 +118,24 @@ class SizesofproductController extends Controller
     {
         $model = $this->findModel($id);
 
+        $oldModel = [
+            'id' => $model->id,
+            'product_id' => $model->product_id,
+            'size_id' => $model->size->size,
+            'color_id' => $model->color->color_name,
+            'availability' => $model->availability,
+        ];
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            $newModel = [
+                'id' => $model->id,
+                'product_id' => $model->product_id,
+                'size_id' => $model->size->size,
+                'color_id' => $model->color->color_name,
+                'availability' => $model->availability,
+            ];
+            Log::writeLog(Log::logMessageGenerator($oldModel, $newModel, $model), 'Update', 'Размеры и количество');
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [
@@ -119,6 +153,12 @@ class SizesofproductController extends Controller
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
+
+        $newModel = [
+            'id' => $id,
+        ];
+        $model = new Sizesofproduct();
+        Log::writeLog(Log::logMessageGenerator(false, $newModel, $model), 'Delete', 'Размеры и количество');
 
         return $this->redirect(['index']);
     }

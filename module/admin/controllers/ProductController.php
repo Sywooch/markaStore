@@ -3,8 +3,10 @@
 namespace app\module\admin\controllers;
 
 use app\module\admin\models\Genus;
+use app\module\admin\models\Notify;
 use app\module\admin\models\Sizesofproduct;
 use Yii;
+use app\module\admin\models\Log;
 use app\module\admin\models\Product;
 use app\module\admin\models\ProductSearch;
 use app\module\admin\models\Materialproduct;
@@ -116,7 +118,30 @@ class ProductController extends Controller
     {
         $model = new Product();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+
+            $model->sale = empty($model->sale) ? 0 : $model->sale;
+
+            $model->save();
+
+            $notifyModel = new Notify();
+            $notifyModel->checkNotify();
+
+            $newModel = [
+                'product_id' => $model->product_id,
+                'name_id' => $model->name->name,
+                'cost' => $model->cost,
+                'sale' => $model->sale,
+                'description' => $model->description,
+                'brand_id' => $model->brand->brand,
+                'brand_art' => $model->brand_art,
+                'genus_id' => $model->genus->genus,
+                'type_id' => $model->type->type,
+                'public' => $model->public
+            ];
+
+            Log::writeLog(Log::logMessageGenerator(false, $newModel, $model), 'Create', 'Список товаров');
+
             return $this->redirect(['view', 'id' => $model->product_id]);
         } else {
             return $this->render('create', [
@@ -135,7 +160,44 @@ class ProductController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $oldModel = [
+            'product_id' => $model->product_id,
+            'name_id' => $model->name->name,
+            'cost' => $model->cost,
+            'sale' => $model->sale,
+            'description' => $model->description,
+            'brand_id' => $model->brand->brand,
+            'brand_art' => $model->brand_art,
+            'genus_id' => $model->genus->genus,
+            'type_id' => $model->type->type,
+            'public' => $model->public
+        ];
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            $model->date_change = date('Y-m-d H:i:s');
+            $model->sale = empty($model->sale) ? 0 : $model->sale;
+
+            $model->save();
+
+            $notifyModel = new Notify();
+            $notifyModel->checkNotify();
+
+            $newModel = [
+                'product_id' => $model->product_id,
+                'name_id' => $model->name->name,
+                'cost' => $model->cost,
+                'sale' => $model->sale,
+                'description' => $model->description,
+                'brand_id' => $model->brand->brand,
+                'brand_art' => $model->brand_art,
+                'genus_id' => $model->genus->genus,
+                'type_id' => $model->type->type,
+                'public' => $model->public
+            ];
+
+            Log::writeLog(Log::logMessageGenerator($oldModel, $newModel, $model), 'Update', 'Список товаров');
+
             return $this->redirect(['view', 'id' => $model->product_id]);
         } else {
             return $this->render('update', [
@@ -159,6 +221,13 @@ class ProductController extends Controller
             unlink('images/' . substr($images->img_file, strrpos($images->img_file, '/')));
         }
         Images::deleteAll('product_id = :product_id', [':product_id' => $id]);
+
+        $newModel = [
+            'product_id' => $id,
+        ];
+        $model = new Product();
+        Log::writeLog(Log::logMessageGenerator(false, $newModel, $model), 'Delete', 'Список товаров');
+
         return $this->redirect(['index']);
     }
 
@@ -184,6 +253,20 @@ class ProductController extends Controller
         if (Sizesofproduct::find()->where(['product_id' => $publication->product_id])->count() > 0) {
             $publication->public = 1;
             $publication->save();
+
+            $newModel = [
+                'product_id' => $id,
+                'genus_id' => $publication->genus->genus,
+                'name_id' => $publication->name->name,
+                'brand_id' => $publication->brand->brand,
+            ];
+            $model = new Product();
+
+            $notifyModel = new Notify();
+            $notifyModel->checkNotify();
+
+            Log::writeLog(Log::logMessageGenerator(false, $newModel, $model), 'Publish', 'Список товаров');
+
             return $this->redirect(['index']);
         }
         else{
@@ -196,6 +279,15 @@ class ProductController extends Controller
         $publication = Product::find()->where(['product_id' => $id])->one();
         $publication->public = 0;
         $publication->save();
+        $newModel = [
+            'product_id' => $id,
+            'genus_id' => $publication->genus->genus,
+            'name_id' => $publication->name->name,
+            'brand_id' => $publication->brand->brand,
+        ];
+        $model = new Product();
+        Log::writeLog(Log::logMessageGenerator(false, $newModel, $model), 'UnPublish', 'Список товаров');
+
         return $this->redirect(['index']);
     }
 

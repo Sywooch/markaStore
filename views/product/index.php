@@ -40,8 +40,21 @@
 
     $this->title = isset($genus) ? strtoupper($genus->genus) : 'Всі';
     $this->params['breadcrumbs'][] = $this->title;
+
 ?>
-<center><?= LinkPager::widget(['pagination' => $pagination]) ?></center>
+<table width="100%">
+    <tr>
+        <td width="20%">
+            <div class="group-item">
+                <?= Html::a('12',Url::current(['pagination' => 12]), ['class' => 'primary-button-large-wide btn-sm']) ?>
+                <?= Html::a('24',Url::current(['pagination' => 24]), ['class' => 'primary-button-large-wide btn-sm']) ?>
+                <?= Html::a('всі',Url::current(['pagination' => 0]), ['class' => 'primary-button-large-wide btn-sm']) ?>
+            </div>
+        </td>
+        <td><center><?= LinkPager::widget(['pagination' => $pagination]) ?></center></td>
+    </tr>
+</table>
+
 <div class="product-index">
     <div class="row">
         <div class="col-md-3">
@@ -144,6 +157,13 @@
                 </div>
             </div>
 
+            <div class="panel panel-default">
+                <div class="panel-body" align="center">
+                    <a class="btn btn-default" href="<?= Url::toRoute( $genus->genus . '/index?type=' . $_GET['type']) ?>">Очистити фільтри</a>
+                </div>
+            </div>
+
+
         </div>
 
         <div class="col-md-9">
@@ -152,8 +172,8 @@
 
 
                 <?php foreach ($products as $product): ?>
-                    <div class="col-xs-6 col-md-4" style="padding-left: 1px; padding-right: 1px;">
-                        <div>
+                    <div class="col-xs-6 col-md-4" style="padding-left: 1px; padding-right: 1px; padding-bottom: 10%;">
+                        <div style="padding-left: 20%; padding-right: 20%;">
                             <?php foreach (Images::find()->
                             select('color_id')->
                             where(['product_id' => $product->product_id])->limit(1)->all() as $color): ?>
@@ -162,15 +182,16 @@
                             select('size_id')->
                             where(['product_id' => $product->product_id])->andWhere(['color_id' => $color->color_id])->limit(1)->all() as $size): ?>
 
-                            <a class="thumbnail" href="view?id=<?= Html::encode($product->product_id); ?>&color=<?= Html::encode($color->color_id); ?>&size=<?= Html::encode($size->size_id); ?>">
-                                <img style="height: 400px;" src="<?php echo Url::base() . '/images/' . Html::encode(ArrayHelper::getValue(Images::find()->
-                                    select('img_file')->
-                                    where(['product_id' => $product->product_id])->
-                                    one(), 'img_file')); ?>"
-                                     alt="<?= Html::encode(Yii::$app->name . ': ' . $product->genus->genus . ' ' . $product->name->name . ' ' . $product->brand->brand); ?>">
+                            <a class="thumbnail"
+                               alt="<?= Html::encode(Yii::$app->name . ': ' . $product->genus->genus . ' ' . $product->name->name . ' ' . $product->brand->brand); ?>"
+                               style="height: 300px; background: url('<?php echo Url::base() . '/images/' . Html::encode(ArrayHelper::getValue(Images::find()->
+                                   select('img_file')->
+                                   where(['product_id' => $product->product_id])->
+                                   one(), 'img_file')); ?>') 50% 50%; background-size: cover;"
+                               href="view?id=<?= Html::encode($product->product_id); ?>&color=<?= Html::encode($color->color_id); ?>&size=<?= Html::encode($size->size_id); ?>">
                             </a>
 
-                            <div class="caption">
+                            <div class="caption" style="/*position: absolute;*/ width: 100%;">
                                 <a data-toggle="tooltip" data-placement="top" title=""
                                    href="view?id=<?= Html::encode($product->product_id); ?>&color=<?= Html::encode($color->color_id); ?>&size=<?= Html::encode($size->size_id); ?>"
                                    class="text-muted"><h5 class="text-uppercase text-center">
@@ -204,5 +225,6 @@
         </div>
     </div>
 </div>
+
 
 

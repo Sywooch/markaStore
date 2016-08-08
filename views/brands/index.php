@@ -33,9 +33,11 @@ $this->title = 'Brands';
     //])
     ?>
         <?php foreach ($allbrands as $brand): ?>
+            <?php if(\app\module\admin\models\Product::find()->where(['public' => 1])->where(['brand_id' => $brand->id])->count() > 0): ?>
         <div class="col-md-2" style="height: 50px;"><p class="text-center text-uppercase" >
         <?= Html::a(Html::encode($brand->brand) ,  Url::toRoute('all/brand?brand=' . $brand->id), ['style' => 'color: #1a1a1a;']); ?>
             </p></div>
+            <?php endif; ?>
 <? endforeach; ?>
 
         </div>

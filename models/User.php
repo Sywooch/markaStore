@@ -6,6 +6,17 @@
     use yii\base\NotSupportedException;
     use Yii;
 
+    /**
+     * This is the model class for table "user".
+     *
+     * @property integer $id
+     * @property string $username
+     * @property string $password
+     * @property string $auth_key
+     * @property string $token
+     * @property string $email
+     * @property string $role
+     */
     class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 //class User extends \yii\base\Object implements \yii\web\IdentityInterface
     {
@@ -15,6 +26,8 @@
 //    public $authKey;
 //    public $accessToken;
 
+
+
         /**
          * @inheritdoc
          */
@@ -23,6 +36,8 @@
             return [
                 'id' => 'ID',
                 'username' => 'Username',
+                'first_name' => 'Forst name',
+                'last_name' => 'Last name',
                 'password' => 'Password',
                 'auth_key' => 'Auth Key',
                 'token' => 'Token',
@@ -120,7 +135,7 @@
         {
             //return $this->password === $password;//sha1($password);
             //return Yii::$app->security->validatePassword($password, $this->password_hash);
-            return $this->password === $password;
+            return $this->password === md5($password);
         }
 
         /**

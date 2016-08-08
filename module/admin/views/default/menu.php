@@ -56,10 +56,20 @@
 		<ul class="dropdown-menu">
 			<li><?= Html::a('Слайдер', [Url::to('/admin/slidebar/index')]); ?></li>
 			<li><?= Html::a('Посты', [Url::to('/admin/post/index')]); ?></li>
+			<li><?= Html::a('E-mail рассылка', [Url::to('/admin/messages/index')]); ?></li>
+			<li><?= Html::a('Условия рассылки', [Url::to('/admin/notify/index')]); ?></li>
+			<li role="separator" class="divider"></li>
 			<li><?= Html::a('Разделы', [Url::to('/admin/genus/index')]); ?></li>
 			<li><?= Html::a('Типы товаров', [Url::to('/admin/types/index')]); ?></li>
 			<li><?= Html::a('Названия товаров', [Url::to('/admin/names/index')]); ?></li>
+			<li role="separator" class="divider"></li>
+			<li><?= Html::a('<small><span class="glyphicon glyphicon-bullhorn"></span></small> Подписчики', [Url::to('/admin/followers/index')]); ?></li>
 			<li><?= Html::a('<small><span class="glyphicon glyphicon-user"></span></small> Пользователи', [Url::to('/admin/user/index')]); ?></li>
 		</ul>
 	</div>
+	<?= Html::a('<span class="glyphicon glyphicon-wrench"></span> Конфигурация', [Url::to('/admin/config/index')],
+		['class' => 'btn btn-default', 'style' => 'text-align: left;']); ?>
+	<?= Html::a('<span class="glyphicon glyphicon-time"></span> История действий', [Url::to('/admin/default/log')],
+		['class' => 'btn btn-default', 'style' => 'text-align: left;']); ?>
+
 </div>

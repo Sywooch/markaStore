@@ -55,6 +55,7 @@ use app\module\admin\models\Sizes;
     }
 
 
+
 </script>
 <div class="product-form">
 
@@ -132,7 +133,8 @@ use app\module\admin\models\Sizes;
     <input id="product-name_id" class="form-control" style="display: none;" name="Product[name_id]">
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Добавить товар' : 'Внести изменения', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? 'Добавить товар' : 'Внести изменения', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary' ,
+            'id' => 'product_button', 'onclick' => 'form.submit();buttonAction(this.id);']) ?>
     </div>
 
     <?php if(isset($_GET['id'])): ?>

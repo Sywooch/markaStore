@@ -16,12 +16,15 @@ use yii\base\Security;
  * @property integer $id
  * @property string $username
  * @property string $password
+ * @property string $password_check
  * @property string $auth_key
  * @property string $token
  * @property string $email
  */
 class User extends \yii\db\ActiveRecord
 {
+	public $password_check;
+
     /**
      * @inheritdoc
      */
@@ -30,48 +33,33 @@ class User extends \yii\db\ActiveRecord
         return 'user';
     }
 
-    /**
-     * @inheritdoc
-     */
-    /*public function rules()
-    {
-        return [
-            [['username', 'password', 'auth_key', 'token', 'email'], 'required'],
-            [['username', 'password', 'auth_key', 'token', 'email'], 'string', 'max' => 255],
-            [['username'], 'unique']
-        ];
-    }*/
-
 	public function rules()
 	{
 		return [
-			[['username', 'email', 'password', 'role'], 'required'],
-//            [['last_login_time', 'create_time', 'update_time'], 'safe'],
-			//[['create_user_id', 'update_user_id'], 'integer'],
-			[['username', 'email', 'password', 'role'], 'string', 'max' => 255],
-			[['email', 'username'], 'unique'],
-			[['auth_key'], 'default', 'value' => Yii::$app->security->generateRandomKey()],
-			[['token'], 'default', 'value' => Yii::$app->security->generateRandomKey()],
-//            [['id', 'email', 'username', 'password', 'last_login_time', 'create_time', 'create_user_id', 'update_time', 'update_user_id'], 'safe', 'on' => 'search'],
+			[['username', 'first_name', 'last_name', 'password', 'password_check', 'email', 'role'], 'required'],
+			['password_check', 'compare', 'compareAttribute' => 'password'],
+			[['username', 'first_name', 'last_name', 'password', 'email'], 'string', 'max' => 255],
+			[['role'], 'string', 'max' => 128],
 		];
 	}
 
-
 	/**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'username' => 'Username',
-            'password' => 'Password',
-            'auth_key' => 'Auth Key',
-            'token' => 'Token',
-            'email' => 'Email',
-			'role' => 'Role'
-        ];
-    }
+	 * @inheritdoc
+	 */
+	public function attributeLabels()
+	{
+		return [
+			'id' => 'ID',
+			'username' => 'Логин',
+			'first_name' => 'Имя',
+			'last_name' => 'Фамиллия',
+			'password' => 'Пароль',
+			'auth_key' => 'Auth Key',
+			'token' => 'Token',
+			'email' => 'Email',
+			'role' => 'Role',
+		];
+	}
 
 	public static function findIdentity($id)
 	{
@@ -197,6 +185,16 @@ class User extends \yii\db\ActiveRecord
 	public function removePasswordResetToken()
 	{
 		$this->password_reset_token = null;
+	}
+
+	/**
+	 * @param array $emails
+	 * @return array
+	 */
+	static function getAdminEmails($emails = [])
+	{   $model = new User();
+		foreach ($model->find()->where(['role' => 'admin'])->all() as $user) $emails[] = $user->email;
+		return $emails;
 	}
 
 	/*public function behaviors()

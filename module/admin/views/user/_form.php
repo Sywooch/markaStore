@@ -14,10 +14,12 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
 
-    <?= ($model->isNewRecord ?
-        $form->field($model, 'password')->passwordInput(['maxlength' => true]) :
-        $form->field($model, 'password')->passwordInput(['maxlength' => true , 'value' => ''])
-        ) ?>
+    <?= $form->field($model, 'first_name')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'last_name')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'password')->passwordInput(['maxlength' => true])->label('Пароль') ?>
+    <?= $form->field($model, 'password_check')->passwordInput(['maxlength' => true])->label('Подтвердите пароль') ?>
 
     <?/*= $form->field($model, 'auth_key')->textInput(['maxlength' => true]) */?>
 

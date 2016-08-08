@@ -21,6 +21,12 @@ use app\module\admin\models\Product;
     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
     <strong> Дякуємо за замовлення! <strong> Ваш номер замовлення: <?php echo $_SESSION['number'] ?>. Наш менеджер зв'яжеться з Вами найближчим часом
 </div>
+    <?php
+    //$order = Order::find()->where(['id' => $_SESSION['number']])->one();
+    //$message = 'Ваш номер замовлення: ' . $order->id. '. Наш менеджер зв`яжеться з Вами найближчим часом';
+    //$orderModel = new Order();
+    //$orderModel->sendEmail($order->email, 'Дякуємо за замовлення!', $message);
+    ?>
 <?php endif ?>
 
 <h4 class="modal-title text-center" xmlns="http://www.w3.org/1999/html">Обрані речі:</h4> </br>

@@ -24,7 +24,7 @@
 		<?php foreach (Order::find()->orderBy('date')->all() as $date_orders): ?>
 			<?php $dates['date'][] = substr($date_orders->date, 0, 4); ?>
 		<?php endforeach ?>
-		<?php foreach (array_unique($dates['date']) as $orders) {
+		<?php foreach (array_unique(isset($dates['date']) ? $dates['date'] : []) as $orders) {
 			foreach (Order::find()->where(['like', 'date', $orders])->all() as $item_id) {
 				//$i_id[] = ->id;
 				$ffddf = Purchases::find()->where(['order_id' => $item_id->id]);
@@ -32,9 +32,9 @@
 				$summa[] = array_sum($ssmf);
 			}
 		}
-			$max = max($summa);
+			$max = max(isset($summa) ? $summa : [1]);
 		?>
-		<?php foreach(array_unique($dates['date']) as $orders): ?>
+		<?php foreach(array_unique(isset($dates['date']) ? $dates['date'] : []) as $orders): ?>
 		<p><h3><?= $orders ?></h3></p>
 		<table class="table">
 			<tr>
@@ -45,6 +45,7 @@
 $count = $count + Purchases::find()->where(['order_id' => $item_id->id])->count();
 ?>
 <?php endforeach; ?>
+
 <span class="glyphicon glyphicon-record" style=" color: <?php echo $count == 0 ? '#cccccc' : '#337ab7'  ?>; padding-top:<?php
 echo 100-($count*100/$max); ?>px; margin-bottom: 0;"><p><?php
 echo $count; ?></p></span>

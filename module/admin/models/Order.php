@@ -40,11 +40,12 @@ class Order extends \yii\db\ActiveRecord
             ['phone', 'required', 'message' => 'Вкажіть Ваш контактний номер телефону. Наприклад +380 999999999'],
             [['user_id', 'status', 'final_cost'], 'integer'],
             [['fio'], 'string', 'max' => 80, 'min' => 5, 'message' => 'Вкажіть Ваше прізвище та ім`я',
-                'tooShort' => 'Вкажіть Ваше прізвище та ім`я',
-                'tooLong' => 'Вкажіть Ваше прізвище та ім`я'],
+                'tooShort' => 'Прізвище та ім`я занадто коротке',
+                'tooLong' => 'Прізвище та ім`я задовге'],
             [['phone'], 'number', 'max' => 999999999, 'min' => 100000000, 'message' => 'Вкажіть Ваш контактний номер телефону. Наприклад +380 999999999',
                 'tooSmall' => 'Вкажіть Ваш контактний номер телефону. Наприклад +380 999999999',
                 'tooBig' => 'Вкажіть Ваш контактний номер телефону. Наприклад +380 999999999'],
+            [['email'], 'required', 'message' => 'Вкажіть Вашу E-mail адрессу'],
             [['email'], 'email', 'message' => 'Вкажіть Вашу E-mail адрессу'],
             [['date'], 'default', 'value' => date('Y-m-d H:i')],
             [['user_id'], 'default', 'value' => !empty(Yii::$app->user->id) ? Yii::$app->user->id : 0]
@@ -72,4 +73,25 @@ class Order extends \yii\db\ActiveRecord
     {
         return$this->hasOne(User::className(),['id'=>'user_id']);
     }
+
+    public function sendEmail($to = false, $subject = false, $message = false)
+    {
+        $headers  = "Content-type: text/html; charset=utf-8 \r\n";
+        $headers .= "From: MarkaUa <store@markaua.com.ua>\r\n";
+       // $headers .= "Bcc: art@naverex.net\r\n";
+
+        mail(trim($to), $subject, $message, $headers);
+    }
+
+    public function emailSender($array_to = [], $subject = false, $message = false)
+    {
+        $headers  = "Content-type: text/html; charset=utf-8 \r\n";
+        $headers .= "From: MarkaUa <store@markaua.com.ua>\r\n";
+        // $headers .= "Bcc: art@naverex.net\r\n";
+
+        foreach ($array_to as $to){
+            mail(trim($to), $subject, $message, $headers);
+        }
+    }
+
 }
