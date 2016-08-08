@@ -16,4 +16,3 @@ Install Yii2 framework http://www.yiiframework.com/download/
 &
 
 $ git clone https://github.com/artroot/markaStore.git
-
